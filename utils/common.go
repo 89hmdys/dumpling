@@ -3,13 +3,12 @@ package utils
 import (
 	"code.google.com/p/go-uuid/uuid"
 	"fmt"
+	"io/ioutil"
 	"net"
+	"net/http"
 	"sort"
 	"strings"
 )
-
-const FORMAT_DATETIME_SHORT = "20060102150405"
-const FORMAT_DATETIME = "2006-01-02 15:04:05"
 
 func ParaFilter(para map[string]string) {
 	for key, value := range para {
@@ -52,4 +51,29 @@ func LocalIP() string {
 		}
 	}
 	return ""
+}
+
+func Post(url string, header map[string]string, content string) (string, error) {
+	client := &http.Client{}
+
+	req, err := http.NewRequest("POST", url, strings.NewReader(content))
+	if err != nil {
+		return "", err
+	}
+
+	for k, v := range header {
+		req.Header.Set(k, v)
+	}
+
+	resp, err := client.Do(req)
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(body), nil
 }

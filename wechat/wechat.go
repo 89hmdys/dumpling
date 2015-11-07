@@ -2,27 +2,14 @@ package wechat
 
 import (
 	"bytes"
+	"crypto/md5"
 	. "dumpling/utils"
 	"encoding/hex"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"strings"
-	"toast/hash/md5"
 )
-
-const success string = "SUCCESS"
-
-type PrepareOrder struct {
-	ReturnCode string `xml:"return_code"`
-	ResultCode string `xml:"result_code"`
-	PrepayId   string `xml:"prepay_id,omitempty"`
-}
-
-type Receipt struct {
-	OrderNo    string
-	TradeNo    string
-	TotalPrice string
-}
 
 type wechat struct {
 	AppId     string //应用ID
@@ -31,20 +18,32 @@ type wechat struct {
 	NotifyUrl string //回调地址
 }
 
-func (this *wechat) Notify(src map[string]string) (*Receipt, error) {
-	returnCode := src["return_code"]
+func (this *wechat) Notify(notificationXml string) (*Receipt, error) {
+
+	notification := notification{}
+
+	err := xml.Unmarshal([]byte(notificationXml), &notification)
+	if err != nil {
+		return nil, err
+	}
+
+	notificationMap := notification.toMap()
+
+	returnCode := notificationMap["return_code"]
 
 	if returnCode != success {
 		return nil, errors.New("pay fail")
 	}
-	sign := src["sign"]
-	mySign, errSign := this.sign(src)
+	sign := notificationMap["sign"]
+	mySign, errSign := this.sign(notificationMap)
 	if errSign != nil {
 		return nil, errors.New("verify sign fail")
 	}
 
 	if strings.ToLower(mySign) == strings.ToLower(sign) {
-		return &Receipt{OrderNo: src["out_trade_no"], TradeNo: src["transaction_id"], TotalPrice: src["total_fee"]}, nil
+		return &Receipt{OrderNo: notificationMap["out_trade_no"],
+			TradeNo:    notificationMap["transaction_id"],
+			TotalPrice: notificationMap["total_fee"]}, nil
 	} else {
 		return nil, errors.New("verify sign fail")
 	}
@@ -55,9 +54,11 @@ func (this *wechat) sign(src map[string]string) (string, error) {
 	waitToSign := SortAndJoin(src)
 	waitToSign = fmt.Sprintf("%s&key=%s", waitToSign, this.AppKey)
 
-	sum := md5.Sum([]byte(waitToSign))
+	hash := md5.New()
+	hash.Write([]byte(waitToSign))
+	sum := md5.Sum(nil)
 
-	return strings.ToUpper(hex.EncodeToString(sum)), nil
+	return strings.ToUpper(hex.EncodeToString(sum[:])), nil
 }
 
 func (this *wechat) toXml(order map[string]string) string {

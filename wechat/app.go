@@ -9,15 +9,7 @@ import (
 	"time"
 )
 
-//const tradeType string = "APP"
-//const minInterval time.Duration = 5 * time.Minute //最短间隔5分钟
-type AppPayCommand struct {
-	OrderNo string  //订单编号
-	Subject string  //商品名称
-	Price   float64 //支付价格
-}
-
-func NewForAPP(appId, appKey, mchId, notifyUrl string) Pay {
+func NewAppClient(appId, appKey, mchId, notifyUrl string) Pay {
 	return &app{wechat: wechat{
 		AppId:     appId,
 		AppKey:    appKey,
@@ -29,28 +21,20 @@ type app struct {
 	wechat
 }
 
-func (this *app) Pay(v interface{}) (map[string]string, error) {
-	command := v.(AppPayCommand)
+func (this *app) Pay(order Order) (map[string]string, error) {
 
-	orderInfo := make(map[string]string)
-	orderInfo["appid"] = this.AppId
-	orderInfo["mch_id"] = this.MchId
-	orderInfo["nonce_str"] = utils.UUID()
-	orderInfo["out_trade_no"] = command.OrderNo
-	orderInfo["body"] = command.Subject
-	orderInfo["total_fee"] = fmt.Sprintf("%.0f", command.Price)
-	orderInfo["spbill_create_ip"] = utils.LocalIP()
-	orderInfo["notify_url"] = this.NotifyUrl
-	orderInfo["trade_type"] = "APP"
+	order["appid"] = this.AppId
+	order["mch_id"] = this.MchId
+	order["notify_url"] = this.NotifyUrl
 
-	sign, err := this.sign(orderInfo)
+	sign, err := this.sign(order)
 
 	if err != nil {
 		return nil, err
 	}
-	orderInfo["sign"] = sign
+	order["sign"] = sign
 
-	orderInfoXml := this.toXml(orderInfo)
+	orderInfoXml := this.toXml(order)
 
 	header := map[string]string{
 		"Content-Type": "text/xml;charset=UTF-8"}
@@ -65,7 +49,7 @@ func (this *app) Pay(v interface{}) (map[string]string, error) {
 }
 
 func (this *app) prepareOrder(src string) (map[string]string, error) {
-	prepareOrder := &PrepareOrder{}
+	prepareOrder := &prepareOrder{}
 	err := xml.Unmarshal([]byte(src), prepareOrder)
 	if err != nil {
 		return nil, err

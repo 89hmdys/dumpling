@@ -1,7 +1,6 @@
 package wechat
 
 import (
-	"dumpling/utils"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -9,14 +8,7 @@ import (
 	"time"
 )
 
-type JsApiPayCommand struct {
-	OrderNo string  //订单编号
-	Subject string  //商品名称
-	Price   float64 //支付价格
-	OpenId  string  //用户OPENID
-}
-
-func NewForJSAPI(appId, appKey, mchId, notifyUrl string) Pay {
+func NewSubscriptionClient(appId, appKey, mchId, notifyUrl string) Pay {
 	return &jsapi{wechat: wechat{
 		AppId:     appId,
 		AppKey:    appKey,
@@ -28,29 +20,20 @@ type jsapi struct {
 	wechat
 }
 
-func (this *jsapi) Pay(v interface{}) (map[string]string, error) {
-	command := v.(JsApiPayCommand)
+func (this *jsapi) Pay(order Order) (map[string]string, error) {
 
-	orderInfo := make(map[string]string)
-	orderInfo["appid"] = this.AppId
-	orderInfo["mch_id"] = this.MchId
-	orderInfo["nonce_str"] = utils.UUID()
-	orderInfo["out_trade_no"] = command.OrderNo
-	orderInfo["body"] = command.Subject
-	orderInfo["total_fee"] = fmt.Sprintf("%.0f", command.Price)
-	orderInfo["spbill_create_ip"] = utils.LocalIP()
-	orderInfo["notify_url"] = this.NotifyUrl
-	orderInfo["trade_type"] = "JSAPI"
-	orderInfo["openid"] = command.OpenId
+	order["appid"] = this.AppId
+	order["mch_id"] = this.MchId
+	order["notify_url"] = this.NotifyUrl
 
-	sign, err := this.sign(orderInfo)
+	sign, err := this.sign(order)
 
 	if err != nil {
 		return nil, err
 	}
-	orderInfo["sign"] = sign
+	order["sign"] = sign
 
-	orderInfoXml := this.toXml(orderInfo)
+	orderInfoXml := this.toXml(order)
 
 	header := map[string]string{
 		"Content-Type": "text/xml;charset=UTF-8"}
@@ -65,7 +48,7 @@ func (this *jsapi) Pay(v interface{}) (map[string]string, error) {
 }
 
 func (this *jsapi) prepareOrder(src string) (map[string]string, error) {
-	prepareOrder := &PrepareOrder{}
+	prepareOrder := &prepareOrder{}
 	err := xml.Unmarshal([]byte(src), prepareOrder)
 	if err != nil {
 		return nil, err

@@ -9,8 +9,7 @@ import (
 )
 
 const (
-	FORMAT_DATETIME_SHORT = "20060102150405"
-	FORMAT_DATETIME       = "2006-01-02 15:04:05"
+	formatDatetime string = "2006-01-02 15:04:05"
 )
 
 type notification struct {
@@ -82,12 +81,12 @@ func (this OrderBuilder) SetFeeType(feeType string) OrderBuilder {
 }
 
 func (this OrderBuilder) SetStartTime(startTime time.Time) OrderBuilder {
-	this["time_start"] = startTime.Format(FORMAT_DATETIME)
+	this["time_start"] = startTime.Format(formatDatetime)
 	return this
 }
 
 func (this OrderBuilder) SetExpireTime(expireTime time.Time) OrderBuilder {
-	this["time_expire"] = expireTime.Format(FORMAT_DATETIME)
+	this["time_expire"] = expireTime.Format(formatDatetime)
 	return this
 }
 
@@ -96,7 +95,7 @@ func (this OrderBuilder) SetLimitPay(rule string) OrderBuilder {
 	return this
 }
 
-func (this OrderBuilder) BuildForApp(orderNo, description string, price int64) map[string]string {
+func (this OrderBuilder) BuildForApp(orderNo, description string, price int64) Order {
 
 	this["nonce_str"] = utils.UUID()
 	this["out_trade_no"] = orderNo
@@ -108,7 +107,7 @@ func (this OrderBuilder) BuildForApp(orderNo, description string, price int64) m
 	return Order(this)
 }
 
-func (this OrderBuilder) BuildForSubscription(orderNo, description, openId string, price float64) map[string]string {
+func (this OrderBuilder) BuildForSubscription(orderNo, description, openId string, price float64) Order {
 
 	this["nonce_str"] = utils.UUID()
 	this["out_trade_no"] = orderNo

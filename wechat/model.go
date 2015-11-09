@@ -60,70 +60,62 @@ type Order map[string]string
 
 type OrderBuilder map[string]string
 
-func (this OrderBuilder) SetDevice(device string) OrderBuilder {
-	key := "device_info"
+func (this OrderBuilder) hasSet(key string) {
 	if _, ok := this[key]; ok {
 		delete(this, key)
 	}
+}
+
+func (this OrderBuilder) SetDevice(device string) OrderBuilder {
+	key := "device_info"
+	this.hasSet(key)
 	this[key] = device
 	return this
 }
 
 func (this OrderBuilder) SetDetail(detail string) OrderBuilder {
 	key := "detail"
-	if _, ok := this[key]; ok {
-		delete(this, key)
-	}
+	this.hasSet(key)
 	this[key] = detail
 	return this
 }
 
 func (this OrderBuilder) SetAttach(attach string) OrderBuilder {
 	key := "attach"
-	if _, ok := this[key]; ok {
-		delete(this, key)
-	}
+	this.hasSet(key)
 	this[key] = attach
 	return this
 }
 
 func (this OrderBuilder) SetFeeType(feeType string) OrderBuilder {
 	key := "fee_type"
-	if _, ok := this[key]; ok {
-		delete(this, key)
-	}
+	this.hasSet(key)
 	this[key] = feeType
 	return this
 }
 
 func (this OrderBuilder) SetStartTime(startTime time.Time) OrderBuilder {
 	key := "time_start"
-	if _, ok := this[key]; ok {
-		delete(this, key)
-	}
+	this.hasSet(key)
 	this[key] = startTime.Format(formatDatetime)
 	return this
 }
 
 func (this OrderBuilder) SetExpireTime(expireTime time.Time) OrderBuilder {
 	key := "time_expire"
-	if _, ok := this[key]; ok {
-		delete(this, key)
-	}
+	this.hasSet(key)
 	this[key] = expireTime.Format(formatDatetime)
 	return this
 }
 
 func (this OrderBuilder) SetLimitPay(rule string) OrderBuilder {
 	key := "limit_pay"
-	if _, ok := this[key]; ok {
-		delete(this, key)
-	}
+	this.hasSet(key)
 	this[key] = rule
 	return this
 }
 
-func (this Order) BuildForApp(orderNo, description string, price int64) Order {
+func (this OrderBuilder) BuildForApp(orderNo, description string, price int64) Order {
 
 	this["nonce_str"] = utils.UUID()
 	this["out_trade_no"] = orderNo
@@ -135,7 +127,7 @@ func (this Order) BuildForApp(orderNo, description string, price int64) Order {
 	return Order(this)
 }
 
-func (this Order) BuildForSubscription(orderNo, description, openId string, price float64) Order {
+func (this OrderBuilder) BuildForSubscription(orderNo, description, openId string, price float64) Order {
 
 	this["nonce_str"] = utils.UUID()
 	this["out_trade_no"] = orderNo

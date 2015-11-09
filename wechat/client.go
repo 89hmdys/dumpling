@@ -8,7 +8,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"noodles/http"
 	"strings"
 	"time"
 )
@@ -105,7 +104,7 @@ func (this *app) Pay(order Order) (map[string]string, error) {
 	header := map[string]string{
 		"Content-Type": "text/xml;charset=UTF-8"}
 
-	returnXml, err := http.Post("https://api.mch.weixin.qq.com/pay/unifiedorder", header, orderInfoXml)
+	returnXml, err := utils.Post("https://api.mch.weixin.qq.com/pay/unifiedorder", header, orderInfoXml)
 
 	if err != nil {
 		return nil, err
@@ -171,7 +170,7 @@ func (this *subscription) Pay(order Order) (map[string]string, error) {
 	header := map[string]string{
 		"Content-Type": "text/xml;charset=UTF-8"}
 
-	returnXml, err := http.Post("https://api.mch.weixin.qq.com/pay/unifiedorder", header, orderInfoXml)
+	returnXml, err := utils.Post("https://api.mch.weixin.qq.com/pay/unifiedorder", header, orderInfoXml)
 
 	if err != nil {
 		return nil, err

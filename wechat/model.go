@@ -12,7 +12,7 @@ const (
 	formatDatetime string = "2006-01-02 15:04:05"
 )
 
-type notification struct {
+type Notification struct {
 	AppId         string `xml:"appid,emitempty"`
 	BankType      string `xml:"bank_type,emitempty"`
 	CashFee       string `xml:"cash_fee,emitempty"`
@@ -31,7 +31,7 @@ type notification struct {
 	TransactionId string `xml:"transaction_id,emitempty"`
 }
 
-func (this notification) toMap() map[string]string {
+func (this Notification) ToMap() map[string]string {
 	t := reflect.TypeOf(this).Elem()
 	v := reflect.ValueOf(this).Elem()
 
@@ -48,12 +48,6 @@ type prepareOrder struct {
 	ReturnCode string `xml:"return_code"`
 	ResultCode string `xml:"result_code"`
 	PrepayId   string `xml:"prepay_id,omitempty"`
-}
-
-type Receipt struct {
-	OrderNo    string
-	TradeNo    string
-	TotalPrice string
 }
 
 type Order map[string]string

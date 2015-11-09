@@ -23,32 +23,26 @@ type wechat struct {
 	NotifyUrl string //回调地址
 }
 
-func (this *wechat) Notify(notificationXml string) (*Receipt, error) {
+func (this *wechat) Notify(notificationXml string) (*Notification, error) {
 
-	notification := notification{}
+	notification := &Notification{}
 
-	err := xml.Unmarshal([]byte(notificationXml), &notification)
+	err := xml.Unmarshal([]byte(notificationXml), notification)
 	if err != nil {
 		return nil, err
 	}
 
-	notificationMap := notification.toMap()
-
-	returnCode := notificationMap["return_code"]
-
-	if returnCode != success {
+	if notification.ReturnCode != success {
 		return nil, errors.New("pay fail")
 	}
-	sign := notificationMap["sign"]
-	mySign, errSign := this.sign(notificationMap)
+	sign := notification.Sign
+	mySign, errSign := this.sign(notification.ToMap())
 	if errSign != nil {
 		return nil, errors.New("verify sign fail")
 	}
 
 	if strings.ToLower(mySign) == strings.ToLower(sign) {
-		return &Receipt{OrderNo: notificationMap["out_trade_no"],
-			TradeNo:    notificationMap["transaction_id"],
-			TotalPrice: notificationMap["total_fee"]}, nil
+		return notification, nil
 	} else {
 		return nil, errors.New("verify sign fail")
 	}

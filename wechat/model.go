@@ -13,22 +13,23 @@ const (
 )
 
 type Notification struct {
-	AppId         string `xml:"appid,emitempty"`
-	BankType      string `xml:"bank_type,emitempty"`
-	CashFee       string `xml:"cash_fee,emitempty"`
-	FeeType       string `xml:"fee_type,emitempty"`
-	IsSubscribe   string `xml:"is_subscribe,emitempty"`
-	MchId         string `xml:"mch_id,emitempty"`
-	NonceStr      string `xml:"nonce_str,emitempty"`
-	OpenId        string `xml:"openid,emitempty"`
-	OutTradeNo    string `xml:"out_trade_no,emitempty"`
+	AppId         string `xml:"appid,emitempty"`        //应用ID
+	Attach        string `xml:"attach,emitempty"`       //自定义数据，支付时提交，原文返回
+	BankType      string `xml:"bank_type,emitempty"`    //付款银行
+	CashFee       string `xml:"cash_fee,emitempty"`     //现金支付金额
+	FeeType       string `xml:"fee_type,emitempty"`     //货币类型
+	IsSubscribe   string `xml:"is_subscribe,emitempty"` //是否关注微信号
+	MchId         string `xml:"mch_id,emitempty"`       //商户ID
+	NonceStr      string `xml:"nonce_str,emitempty"`    //随机数
+	OpenId        string `xml:"openid,emitempty"`       //用户OPENID
+	OutTradeNo    string `xml:"out_trade_no,emitempty"` //商户订单号
 	ReturnCode    string `xml:"return_code,emitempty"`
 	ResultCode    string `xml:"result_code,emitempty"`
 	Sign          string `xml:"sign,emitempty"`
-	TimeEnd       string `xml:"time_end,emitempty"`
-	TotalFee      string `xml:"total_fee,emitempty"`
-	TradeType     string `xml:"trade_type,emitempty"`
-	TransactionId string `xml:"transaction_id,emitempty"`
+	TimeEnd       string `xml:"time_end,emitempty"`       //支付结束时间
+	TotalFee      string `xml:"total_fee,emitempty"`      //支付总金额
+	TradeType     string `xml:"trade_type,emitempty"`     //交易类型 JSAPI APP这些
+	TransactionId string `xml:"transaction_id,emitempty"` //微信流水号
 }
 
 func (this Notification) ToMap() map[string]string {

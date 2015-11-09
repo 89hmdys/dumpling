@@ -47,14 +47,11 @@
 
     /*
       微信的通知消息是放在request的content内的xml字符串，
-      从content中取出来，作为参数传入Notify方法就OK了，支付成功会返回
-      type Receipt struct {
-	      OrderNo    string
-	      TradeNo    string
-	      TotalPrice string
-      }这样一个struct的实例，如果失败，返回error
+      从content中取出来，作为参数传入Notify方法，
+      如果支付成功，方法会讲微信通知的数据封装到Notification结构里返回前台，
+      如果支付失败，则返回error
     */
-    receipt,err:=client.Notify(notifyMessge)
+    notification,err:=client.Notify(notifyMessge)
     if err != nil {
 		fmt.Println(err)
 	}

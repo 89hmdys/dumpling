@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	formatDatetime string = "2006-01-02 15:04:05"
+	formatDatetime string = "20060102150405"
 )
 
 type Notification struct {
@@ -89,17 +89,13 @@ func (this OrderBuilder) SetFeeType(feeType string) OrderBuilder {
 	return this
 }
 
-func (this OrderBuilder) SetStartTime(startTime time.Time) OrderBuilder {
+func (this OrderBuilder) SetTime(startTime time.Time, duration int64) OrderBuilder {
 	key := "time_start"
 	this.hasSet(key)
 	this[key] = startTime.Format(formatDatetime)
-	return this
-}
-
-func (this OrderBuilder) SetExpireTime(expireTime time.Time) OrderBuilder {
-	key := "time_expire"
+	key = "time_expire"
 	this.hasSet(key)
-	this[key] = expireTime.Format(formatDatetime)
+	this[key] = startTime.Add(time.Duration(duration) * time.Minute)
 	return this
 }
 

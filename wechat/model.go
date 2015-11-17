@@ -1,8 +1,8 @@
 package wechat
 
 import (
-	"dumpling/utils"
 	"fmt"
+	"github.com/89hmdys/dumpling/utils"
 	"reflect"
 	"strings"
 	"time"

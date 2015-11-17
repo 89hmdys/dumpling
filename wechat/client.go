@@ -3,11 +3,11 @@ package wechat
 import (
 	"bytes"
 	"crypto/md5"
-	"dumpling/utils"
 	"encoding/hex"
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"github.com/89hmdys/dumpling/utils"
 	"strings"
 	"time"
 )
